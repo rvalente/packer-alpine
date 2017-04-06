@@ -1,0 +1,34 @@
+# Use US layout with US variant
+KEYMAPOPTS="us us"
+
+# Set hostname to alpine-test
+HOSTNAMEOPTS="-n vagrant"
+
+# Contents of /etc/network/interfaces
+INTERFACESOPTS="auto lo
+iface lo inet loopback
+
+auto eth0
+iface eth0 inet dhcp
+  hostname vagrant
+
+# Search domain of example.com, Google public nameserver
+DNSOPTS=""
+
+# Set timezone to UTC
+TIMEZONEOPTS="-z UTC"
+
+# set http/ftp proxy
+PROXYOPTS=""
+
+# Add a random mirror
+APKREPOSOPTS="-f"
+
+# Install Openssh
+SSHDOPTS="-c openssh"
+
+# Use Chrony
+NTPOPTS="-c chrony"
+
+# Use /dev/sda as a lvmsys disk
+DISKOPTS="-m sys /dev/sda"

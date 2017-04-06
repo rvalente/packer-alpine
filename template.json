@@ -1,0 +1,79 @@
+{
+  "builders": [
+    {
+      "type": "vmware-iso",
+      "vm_name": "{{user `vm_name`}}-{{user `vm_version`}}-{{user `vm_arch`}}",
+      "vmdk_name": "{{user `vm_name`}}-{{user `vm_version`}}-{{user `vm_arch`}}",
+      "boot_command": [
+        "root<enter><wait>",
+        "ifconfig eth0 up && udhcpc -i eth0<enter><wait5>",
+        "wget http://{{ .HTTPIP }}:{{ .HTTPPort }}/answers<enter><wait>",
+        "setup-alpine -f answers<enter><wait10>",
+        "vagrant<enter><wait>",
+        "vagrant<enter><wait10>",
+        "y<enter>",
+        "<wait10><wait10><wait10>",
+        "/etc/init.d/sshd stop<enter><wait>",
+        "eject -r<enter>",
+        "reboot<enter>"
+      ],
+      "disk_size": 20480,
+      "disk_type_id": "0",
+      "format": "ova",
+      "guest_os_type": "other3xlinux-64",
+      "headless": false,
+      "http_directory": "http",
+      "iso_checksum_type": "{{ user `alpine_checksum_type` }}",
+      "iso_checksum_url": "{{ user `alpine_checksum_url` }}",
+      "iso_url": "{{ user `alpine_iso_url` }}",
+      "shutdown_command": "echo {{ user `guest_password` }} | sudo -S shutdown -P now",
+      "ssh_password": "{{ user `guest_password` }}",
+      "ssh_username": "{{ user `guest_username` }}",
+      "ssh_wait_timeout": "20m",
+      "version": "11",
+      "vmx_data": {
+        "cpuid.coresPerSocket": "1",
+        "memsize": "4096",
+        "numvcpus": "2",
+        "ethernet0.present": "TRUE",
+        "ethernet0.startConnected": "TRUE",
+        "ethernet0.virtualDev": "vmxnet3",
+        "tools.syncTime": "0",
+        "time.synchronize.continue": "0",
+        "time.synchronize.restore": "0",
+        "time.synchronize.resume.disk": "0",
+        "time.synchronize.shrink": "0",
+        "time.synchronize.tools.startup": "0",
+        "time.synchronize.tools.enable": "0",
+        "time.synchronize.resume.host": "0"
+      }
+    }
+  ],
+  "provisioners": [
+    {
+      "execute_command": "echo '{{ user `guest_password` }}' | {{ .Vars }} sudo -E -S bash '{{ .Path }}'",
+      "scripts": [
+        "scripts/00_upgrade.sh",
+        "scripts/01_vagrant.sh",
+        "scripts/99_cleanup.sh"
+      ],
+      "type": "shell"
+    }
+  ],
+  "post-processors": [
+    {
+      "type": "vagrant",
+      "compression_level": 0
+    }
+  ],
+  "variables": {
+    "guest_password": "vagrant",
+    "guest_username": "vagrant",
+    "vm_arch": "x86_64",
+    "vm_version": "3.5.2",
+    "vm_name": "alpine",
+    "alpine_checksum_type": "sha256",
+    "alpine_checksum_url": "https://nl.alpinelinux.org/alpine/v3.5/releases/x86_64/alpine-virt-3.5.2-x86_64.iso.sha256",
+    "alpine_iso_url": "https://nl.alpinelinux.org/alpine/v3.5/releases/x86_64/alpine-virt-3.5.2-x86_64.iso"
+  }
+}
